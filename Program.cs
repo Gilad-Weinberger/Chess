@@ -10,7 +10,7 @@ namespace Chess
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello Yoav Gross");
+            Console.WriteLine("Hello Yoav Gross welcome");
         }
     }
 }
