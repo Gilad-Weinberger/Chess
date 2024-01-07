@@ -10,10 +10,11 @@ namespace Chess
     {
         static void Main(string[] args)
         {
-            DrawBoard();
+            Board Square = new Board();
+            DrawBoard(Square);
         }
 
-        public static void DrawBoard()
+        public static void DrawBoard(Board Square)
         {
             for (int rank = 1; rank <= 8; rank++)
             {
@@ -26,6 +27,7 @@ namespace Chess
                 Console.WriteLine();
             }
             Console.WriteLine(string.Concat(System.Linq.Enumerable.Repeat("-", 33)));
+
         }
     }
 }
