@@ -10,7 +10,6 @@ namespace Chess
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Let's Get Fully Started!!!");
             DrawBoard();
         }
 
