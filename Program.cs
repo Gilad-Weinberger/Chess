@@ -18,8 +18,6 @@ namespace Chess
 
         public static void DrawBoard(int[] Square)
         {
-            foreach (int num in Square)
-                Console.Write(num + " ");
             Console.WriteLine();
             for (int rank = 0; rank < 8; rank++)
             {
@@ -32,6 +30,7 @@ namespace Chess
                 Console.WriteLine();
             }
             Console.WriteLine(string.Concat(System.Linq.Enumerable.Repeat("-", 33)));
+            Console.WriteLine();
         }
     }
 }

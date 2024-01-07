@@ -13,10 +13,6 @@ namespace Chess
         public Board()
         {
             Square = new int[64];
-
-            Square[0] = Piece.White | Piece.Bishop;
-            Square[63] = Piece.Black | Piece.Queen;
-            Square[63] = Piece.Black | Piece.Knight;
         }
 
         public static void LoadPositionFromFen(string fen)
