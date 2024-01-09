@@ -10,80 +10,80 @@ namespace Chess
     {
         static void Main(string[] args)
         {
+            bool checkmate = false, draw = false;
+            int winner = 1;
+
             const string startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-            /*int[] DirectionOffsets = { 8, -8, 1, -1, 7, -7, 9, -9};
-            int[][] NumSquaresToEdge = new int[8][];
-            NumSquaresToEdge = PreComputedMoveData(NumSquaresToEdge);*/
 
-            List<Move> moves = GenerateMoves();
-
+            List<Move> moves = Move.GenerateMoves();
+            
             Board Board = new Board();
             Board.LoadPositionFromFen(startFen);
             DrawBoard(Board.Square);
 
+            while ((!checkmate) & (!draw))
+            {
+                int ColorToMove = Board.ColorToMove;
+                string Color = (ColorToMove == Piece.White) ? "White" : "Black";
+                if (Piece.IsColor(Piece.White, ColorToMove))
+                {
+                    Console.WriteLine($"Enter {Color}'s Move:");
+                    string MoveText = Console.ReadLine();
+                    int startSquare = (int.Parse(MoveText[1].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[0]) - 97)));
+                    int targetSquare = (int.Parse(MoveText[3].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[2]) - 97)));
 
+                    Move move = new Move(startSquare, targetSquare);
+
+                    Board.Move(move);                    
+
+                    Console.Clear();
+                    DrawBoard(Board.Square);
+                }
+                else
+                {
+
+                }
+            }
+
+            if (checkmate)
+            {
+                string winnerColor = (winner == Piece.White) ? "White" : "Black";
+                Console.WriteLine("CheckMate! {} wins!");
+            }
+            else if (draw)
+            {
+                Console.WriteLine("It's a draw!");
+            }
         }
 
         public static void DrawBoard(int[] Square)
         {
             Console.WriteLine();
+            printLetters();
             for (int rank = 7; rank >= 0; rank--)
             {
-                Console.WriteLine(string.Concat(Enumerable.Repeat("-", 33)));
+                Console.WriteLine($"        {string.Concat(Enumerable.Repeat("-", 33))}");
+                Console.Write($"      {rank + 1}");
                 for (int file = 0; file < 8; file++)
                 {
-                    Console.Write("| " + Piece.GetPieceSymbol(Square[rank * 8 + file]) + " ");
+                    Console.Write($" | {Piece.GetPieceSymbol(Square[rank * 8 + file])}");
                 }
-                Console.Write("|");
+                Console.Write($" | {rank + 1}");
                 Console.WriteLine();
             }
-            Console.WriteLine(string.Concat(Enumerable.Repeat("-", 33)));
+            Console.WriteLine($"        {string.Concat(Enumerable.Repeat("-", 33))}");
+            printLetters();
             Console.WriteLine();
         }
 
-        public static List<Move> GenerateMoves()
+        public static void printLetters()
         {
-            List<Move> moves = new List<Move>();
-            for (int startSquare = 0; startSquare < 64; startSquare++)
+            Console.Write("        ");
+            for (int i = 1; i <= 8; i++)
             {
-                int piece = Board.Square[startSquare];
-                if (Piece.IsColor(piece, Board.ColorToMove)){
-                    if (Piece.IsSlidingPiece(piece))
-                    {
-                        // create generateSlidingMoves
-                    }
-                }
+                Console.Write($"  {(char)(i + 96)} ");
             }
-
-            return moves;
-        }
-
-        public static int[][] PreComputedMoveData(int[][] numSquaresToEdge)
-        {
-            for (int file = 0; file < 8; file++)
-            {
-                for (int rank = 0; rank < 8; rank++)
-                {
-                    int numTop = 7 - rank;
-                    int numDown = rank;
-                    int numLeft = file;
-                    int numRight = 7 - file;
-
-                    int squareIndex = rank * 8 + file;
-
-                    numSquaresToEdge[squareIndex] = new int[] {
-                        numTop,
-                        numDown,
-                        numLeft,
-                        numRight,
-                        Math.Min(numTop, numLeft),
-                        Math.Min(numDown, numRight),
-                        Math.Min(numTop, numRight),
-                        Math.Min(numDown, numLeft)
-                    };
-                }
-            }
-            return numSquaresToEdge;
+            Console.WriteLine();
         }
     }
 }

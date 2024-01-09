@@ -45,20 +45,5 @@ namespace Chess
                 return pieceColor == White;
             return pieceColor == Black;
         }
-
-        public static bool IsRookOrQueen(int piece)
-        {
-            return (piece & 0b110) == 0b110;
-        }
-
-        public static bool IsBishopOrQueen(int piece)
-        {
-            return (piece & 0b101) == 0b101;
-        }
-
-        public static bool IsSlidingPiece(int piece)
-        {
-            return (piece & 0b100) != 0;
-        }
     }
 }

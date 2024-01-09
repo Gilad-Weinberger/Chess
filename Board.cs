@@ -8,12 +8,14 @@ namespace Chess
 {
     class Board
     {
-        public static int[] Square;
-        public static int ColorToMove = 8;
+        public static int[] Square = new int[64];
+        public static int ColorToMove = 8, friendlyColor = 8, opponentColor = 16;
 
-        public Board()
+        public static void Move(Move move)
         {
-            Square = new int[64];
+            int PieceToMove = Board.Square[move.startSquare];
+            Board.Square[move.startSquare] = 0;
+            Board.Square[move.targetSquare] = PieceToMove;
         }
 
         public static void LoadPositionFromFen(string fen)
