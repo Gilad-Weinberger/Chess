@@ -10,10 +10,10 @@ namespace Chess
     {
         static void Main(string[] args)
         {
-            const string startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+            const string gameFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
             Board Board = new Board();
-            Board.LoadPositionFromFen(startFen);
+            Board.LoadPositionFromFen(gameFen);
             DrawBoard(Board.Square);
         }
 
