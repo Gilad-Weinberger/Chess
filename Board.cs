@@ -9,6 +9,7 @@ namespace Chess
     class Board
     {
         public static int[] Square;
+        public static int ColorToMove = 8;
 
         public Board()
         {

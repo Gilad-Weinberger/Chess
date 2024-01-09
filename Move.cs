@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Chess
 {
-    class Move
+    struct Move
     {
-        public int StartSquare, TargetSquare;
+        public readonly string startSquare, tagretSquare;
     }
 }
