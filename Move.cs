@@ -8,7 +8,7 @@ namespace Chess
 {
     class Move
     {
-        public readonly int startSquare, targetSquare;
+        public readonly int startSquare, targetSquare, piece;
         public static int[] DirectionOffSets = { 8, -8, 1, -1, 7, -7, 9, -9 };
         public static int[,] NumSquaresToEdge = PreComputedMoveData();
 
@@ -16,6 +16,24 @@ namespace Chess
         {
             this.startSquare = startSquare;
             this.targetSquare = targetSquare;
+            this.piece = piece;
+            ValidateMove();            
+        }
+
+        public static bool ValidateMove()
+        {
+            int pieceType = piece % 8;
+
+            switch (pieceType)
+            {
+                case Piece.None: return ' ';
+                case Piece.King: return (pieceColor == Piece.White) ? 'K' : 'k';
+                case Piece.Queen: return (pieceColor == Piece.White) ? 'Q' : 'q';
+                case Piece.Rook: return (pieceColor == Piece.White) ? 'R' : 'r';
+                case Piece.Bishop: return (pieceColor == Piece.White) ? 'B' : 'b';
+                case Piece.Knight: return (pieceColor == Piece.White) ? 'N' : 'n';
+                case Piece.Pawn: return (pieceColor == Piece.White) ? 'P' : 'p';
+                default: return ' ';
         }
         
         public static List<Move> GenerateMoves()

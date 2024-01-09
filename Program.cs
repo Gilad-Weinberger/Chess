@@ -34,9 +34,15 @@ namespace Chess
 
                     Move move = new Move(startSquare, targetSquare);
 
+                    
+
                     Board.Move(move);                    
 
                     Console.Clear();
+                    for (int i = 0; i < 64; i++)
+                    {
+                        Console.WriteLine($"{i+1}: {Board.Square[i]}");
+                    }
                     DrawBoard(Board.Square);
                 }
                 else
