@@ -8,104 +8,33 @@ namespace Chess
 {
     class Move
     {
-        public readonly int startSquare, targetSquare, piece;
-        public static int[] DirectionOffSets = { 8, -8, 1, -1, 7, -7, 9, -9 };
-        public static int[,] NumSquaresToEdge = PreComputedMoveData();
+        public int startSquare, targetSquare;
+        public int piece;
 
-        public Move(int startSquare, int targetSquare)
+        public Move(int startSquare, int targetSquare, int piece)
         {
-            this.startSquare = startSquare;
-            this.targetSquare = targetSquare;
-            this.piece = piece;
-            ValidateMove();            
+            if (IsMoveValid(piece, startSquare, targetSquare))
+            {
+                this.startSquare = startSquare;
+                this.targetSquare = targetSquare;
+                this.piece = piece;
+            }
         }
 
-        public static bool ValidateMove()
+        public static bool IsMoveValid(int piece, int startSquare, int targetSquare)
         {
             int pieceType = piece % 8;
 
             switch (pieceType)
             {
-                case Piece.None: return ' ';
-                case Piece.King: return (pieceColor == Piece.White) ? 'K' : 'k';
-                case Piece.Queen: return (pieceColor == Piece.White) ? 'Q' : 'q';
-                case Piece.Rook: return (pieceColor == Piece.White) ? 'R' : 'r';
-                case Piece.Bishop: return (pieceColor == Piece.White) ? 'B' : 'b';
-                case Piece.Knight: return (pieceColor == Piece.White) ? 'N' : 'n';
-                case Piece.Pawn: return (pieceColor == Piece.White) ? 'P' : 'p';
-                default: return ' ';
-        }
-        
-        public static List<Move> GenerateMoves()
-        {
-            List<Move> moves = new List<Move>();
-            for (int startSquare = 0; startSquare < 64; startSquare++)
-            {
-                int piece = Board.Square[startSquare];
-                if (Piece.IsColor(piece, Board.ColorToMove))
-                {
-                    /*if (Piece.IsSlidingPiece(piece))
-                    {
-                        GenerateSlidingMoves(startSquare, piece, moves);
-                    }*/
-                }
+                case Piece.King: return ValidateMove.KingOrKnight(new int[] { 8, -8, 1, -1, 7, -7, 9, -9 }, startSquare, targetSquare);
+                case Piece.Queen: return ValidateMove.SlidingPieces(new int[] { 8, -8, 1, -1, 7, -7, 9, -9 }, startSquare, targetSquare);
+                case Piece.Rook: return ValidateMove.SlidingPieces(new int[] { 8, -8, 1, -1 }, startSquare, targetSquare);
+                case Piece.Bishop: return ValidateMove.SlidingPieces(new int[] { 7, -7, 9, -9 }, startSquare, targetSquare);
+                case Piece.Knight: return ValidateMove.KingOrKnight(new int[] { 15, 17, 6, 10, -6, -10, -15, -17}, startSquare, targetSquare);
+                case Piece.Pawn: return ValidateMove.Pawn(startSquare, targetSquare);
+                default: return false;
             }
-
-            return moves;
-        }
-
-        public static List<Move> GenerateSlidingMoves(int startSquare, int piece, List<Move> moves)
-        {
-            for (int directionIndex = 0; directionIndex < 8; directionIndex++)
-            {
-                for (int n = 0; n < NumSquaresToEdge[startSquare, directionIndex]; n++)
-                {
-                    int targetSquare = startSquare + DirectionOffSets[directionIndex] * (n - 1);
-                    int pieceOnTargetSquare = Board.Square[targetSquare];
-
-                    // if the piece try to land on a self-captured piece, break.
-                    if (Piece.IsColor(pieceOnTargetSquare, Board.friendlyColor))
-                    {
-                        break;
-                    }
-
-                    moves.Add(new Move(startSquare, targetSquare));
-
-                    if (Piece.IsColor(pieceOnTargetSquare, Board.opponentColor))
-                    {
-                        break;
-                    }
-                }
-            }
-
-            return moves;
-        }
-
-        public static int[,] PreComputedMoveData()
-        {
-            int[,] numSquaresToEdge = new int[64, 8];
-            for (int file = 0; file < 8; file++)
-            {
-                for (int rank = 0; rank < 8; rank++)
-                {
-                    int numTop = 7 - rank;
-                    int numDown = rank;
-                    int numLeft = file;
-                    int numRight = 7 - file;
-
-                    int squareIndex = rank * 8 + file;
-
-                    numSquaresToEdge[squareIndex, 0] = numTop;
-                    numSquaresToEdge[squareIndex, 1] = numDown;
-                    numSquaresToEdge[squareIndex, 2] = numLeft;
-                    numSquaresToEdge[squareIndex, 3] = numRight;
-                    numSquaresToEdge[squareIndex, 4] = Math.Min(numTop, numLeft);
-                    numSquaresToEdge[squareIndex, 5] = Math.Min(numDown, numRight);
-                    numSquaresToEdge[squareIndex, 6] = Math.Min(numTop, numRight);
-                    numSquaresToEdge[squareIndex, 7] = Math.Min(numDown, numLeft);
-                }
-            }
-            return numSquaresToEdge;
         }
     }
 }

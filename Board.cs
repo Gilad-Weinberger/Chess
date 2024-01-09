@@ -10,6 +10,7 @@ namespace Chess
     {
         public static int[] Square = new int[64];
         public static int ColorToMove = 8, friendlyColor = 8, opponentColor = 16;
+        public static int PawnsRank = 2;
 
         public static void Move(Move move)
         {

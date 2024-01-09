@@ -14,8 +14,6 @@ namespace Chess
             int winner = 1;
 
             const string startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-
-            List<Move> moves = Move.GenerateMoves();
             
             Board Board = new Board();
             Board.LoadPositionFromFen(startFen);
@@ -26,23 +24,27 @@ namespace Chess
                 int ColorToMove = Board.ColorToMove;
                 string Color = (ColorToMove == Piece.White) ? "White" : "Black";
                 if (Piece.IsColor(Piece.White, ColorToMove))
-                {
-                    Console.WriteLine($"Enter {Color}'s Move:");
-                    string MoveText = Console.ReadLine();
-                    int startSquare = (int.Parse(MoveText[1].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[0]) - 97)));
-                    int targetSquare = (int.Parse(MoveText[3].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[2]) - 97)));
+                {                    
+                    while (true)
+                    {
+                        Console.WriteLine($"Enter {Color}'s Move:");
+                        string MoveText = Console.ReadLine();
+                        int startSquare = (int.Parse(MoveText[1].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[0]) - 97)));
+                        int targetSquare = (int.Parse(MoveText[3].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[2]) - 97)));
+                        int piece = Board.Square[startSquare];
 
-                    Move move = new Move(startSquare, targetSquare);
+                        Move move = new Move(startSquare, targetSquare, piece);
 
-                    
+                        if (move != null)
+                        {
+                            Board.Move(move);
+                            break;
+                        }
 
-                    Board.Move(move);                    
+                        Console.WriteLine($"{MoveText} is and invalid move");
+                    }
 
                     Console.Clear();
-                    for (int i = 0; i < 64; i++)
-                    {
-                        Console.WriteLine($"{i+1}: {Board.Square[i]}");
-                    }
                     DrawBoard(Board.Square);
                 }
                 else
