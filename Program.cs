@@ -44,7 +44,6 @@ namespace Chess
                         Console.WriteLine($"{MoveText} is and invalid move");
                     }
 
-                    Console.Clear();
                     DrawBoard(Board.Square);
                 }
                 else
