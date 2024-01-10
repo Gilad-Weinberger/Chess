@@ -34,8 +34,25 @@ namespace Chess
             }
             return false;
         }
-        public static bool Pawn(int startSquare, int targetSquare)
+        public static bool Pawn(int validDirections, int startSquare, int targetSquare)
         {
+            int targetPiece = Board.Square[targetPiece];
+            bool validWriting = false;
+            for (int i = 0; i < validDirections.Length; i++)
+            {
+                if (startSquare + validDirections[i] == targetSquare) 
+                {
+                    validWriting = true;
+                    int Direction = validDirections[i];
+                    break;
+                }
+
+
+            }
+            if (validWriting)
+            {
+            
+            }
             return false;
         }
     }

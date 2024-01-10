@@ -32,7 +32,7 @@ namespace Chess
                 case Piece.Rook: return ValidateMove.SlidingPieces(new int[] { 8, -8, 1, -1 }, startSquare, targetSquare);
                 case Piece.Bishop: return ValidateMove.SlidingPieces(new int[] { 7, -7, 9, -9 }, startSquare, targetSquare);
                 case Piece.Knight: return ValidateMove.KingOrKnight(new int[] { 15, 17, 6, 10, -6, -10, -15, -17}, startSquare, targetSquare);
-                case Piece.Pawn: return ValidateMove.Pawn(startSquare, targetSquare);
+                case Piece.Pawn: return ValidateMove.Pawn(new int[] { 8, 16, 7, 9 }startSquare, targetSquare);
                 default: return false;
             }
         }
