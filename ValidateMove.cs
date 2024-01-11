@@ -9,7 +9,7 @@ namespace Chess
     class ValidateMove
     {
         public static bool SlidingPieces(int[] validDirections, int startSquare, int targetSquare)
-        {
+        { 
             for (int i = 0; i < validDirections.Length; i++)
             {
                 int line = startSquare / 8;
@@ -52,10 +52,6 @@ namespace Chess
             else
                 validDirections = validDirections.Take(4).ToArray();
 
-            for (int i = 0; i < validDirections.Length; i++)
-            {
-                Console.WriteLine(validDirections[i]);
-            }
 
             int Direction = 0;
             bool validWriting = false;
@@ -65,21 +61,34 @@ namespace Chess
                 {
                     validWriting = true;
                     Direction = validDirections[i];
-                    Console.WriteLine(Direction);
                     break;
                 }
             }
             if (validWriting)
             {
                 if (Math.Abs(Direction) == 8)
-                    return targetPiece == Piece.None;
+                {
+                    if (targetPiece == Piece.None)
+                    {
+                        CheckForBecomingQueen(thisPiece, targetSquare);
+                        return true;
+                    }
+                }
                 else if (Math.Abs(Direction) == 16)
+                {
                     if (thisPiece > 16)
                         return targetPiece == Piece.None && (startSquare / 8) + 1 == 7;
                     else
                         return targetPiece == Piece.None && (startSquare / 8) + 1 == 2;
+                }
                 else
-                    return (targetPiece > 16) || EnPassant(startSquare, targetSquare);
+                {
+                    if ((targetPiece > 16) || EnPassant(startSquare, targetSquare))
+                    {
+                        CheckForBecomingQueen(startSquare, targetSquare);
+                        return true;
+                    }
+                }
             }
             return false;
         }
@@ -97,6 +106,17 @@ namespace Chess
                 } 
             }
             return false;
+        }
+
+        public static void CheckForBecomingQueen(int startSquare, int targetSquare)
+        {
+            if ((targetSquare / 8) + 1 == 8)
+            {
+                if (Board.Square[startSquare] > 16)
+                    Board.Square[startSquare] = Piece.Queen | Piece.Black;
+                else
+                    Board.Square[startSquare] = Piece.Queen | Piece.White;
+            }
         }
     }
 }

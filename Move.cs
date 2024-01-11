@@ -25,6 +25,8 @@ namespace Chess
         {
             int pieceType = piece % 8;
 
+            if (piece / 8 == targetSquare / 8) { return false; }
+
             switch (pieceType)
             {
                 case Piece.King: return ValidateMove.KingOrKnight(new int[] { 8, -8, 1, -1, 7, -7, 9, -9 }, startSquare, targetSquare);

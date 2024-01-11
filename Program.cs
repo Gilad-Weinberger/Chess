@@ -26,8 +26,8 @@ namespace Chess
                     {
                         Console.WriteLine($"Enter {Color}'s Move:");
                         string MoveText = Console.ReadLine();
-                        int startSquare = (int.Parse(MoveText[1].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[0]) - 97)));
-                        int targetSquare = (int.Parse(MoveText[3].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[2]) - 97)));
+                        int startSquare = int.Parse(MoveText[1].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[0]) - 97));
+                        int targetSquare = int.Parse(MoveText[3].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[2]) - 97));
                         int piece = Board.Square[startSquare];
 
                         Move move = new Move(startSquare, targetSquare, piece);
@@ -73,7 +73,10 @@ namespace Chess
                 {
                     Console.Write($"|");
                     int piece = Square[rank * 8 + file];
-                    Console.BackgroundColor = ConsoleColor.Red;
+                    if ((file + 7 - rank) % 2 == 0)
+                        Console.BackgroundColor = ConsoleColor.Magenta;
+                    else
+                        Console.BackgroundColor = ConsoleColor.DarkMagenta;
                     if (piece < 16)
                     {
                         Console.ForegroundColor = ConsoleColor.White;
