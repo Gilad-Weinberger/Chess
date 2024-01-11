@@ -23,7 +23,6 @@ namespace Chess
                         return true;
                     }
                     position += validDirections[i];
-                    Console.WriteLine(position + 1);
                 }
             }
             return false;

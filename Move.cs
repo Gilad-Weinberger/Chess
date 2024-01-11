@@ -20,6 +20,15 @@ namespace Chess
                 this.piece = piece;
             }
         }
+        public Move(Move move)
+        {
+            if (IsMoveValid(move.piece, move.startSquare, move.targetSquare))
+            {
+                this.startSquare = move.startSquare;
+                this.targetSquare = move.targetSquare;
+                this.piece = move.piece;
+            }
+        }
 
         public static bool IsMoveValid(int piece, int startSquare, int targetSquare)
         {

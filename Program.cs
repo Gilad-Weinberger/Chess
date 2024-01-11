@@ -20,7 +20,7 @@ namespace Chess
             while ((!Board.checkmate) & (!Board.draw))
             {
                 string Color = (Board.ColorToMove == Piece.White) ? "White" : "Black";
-                if (Piece.IsColor(Piece.White, Board.ColorToMove))
+                if (Board.ColorToMove % 16 != 0)
                 {
                     while (true)
                     {
@@ -41,12 +41,19 @@ namespace Chess
 
                         Console.WriteLine($"{MoveText} is and invalid move");
                     }
-                    /*Console.Clear();*/
-                    DrawBoard(Board.Square);
+                    Board.ColorToMove += 8;
                 }
                 else
                 {
-
+                    Console.Clear();
+                    Move blackMove = new Move(ChooseComputerMove(Board));
+                    if (blackMove != null)
+                        Console.WriteLine("now");
+                    Board.Move(blackMove);
+                    Board.GameMoves.Add(blackMove);
+                    Board.ColorToMove += 8;
+                    Console.WriteLine(Board.ColorToMove);
+                    DrawBoard(Board.Square);
                 }
             }
 
@@ -59,6 +66,37 @@ namespace Chess
             {
                 Console.WriteLine("It's a draw!");
             }
+        }
+
+        public static Move ChooseComputerMove(Board Board)
+        {
+            Random rnd = new Random();
+            List<Move> possibleMoves = GetAllComputerPosibleMoves();
+            int index = rnd.Next(0, possibleMoves.Count);
+            Console.WriteLine(possibleMoves.Count);
+            Move chosenMove = possibleMoves[index];
+            Console.WriteLine($"{chosenMove.piece}, {chosenMove.startSquare}, {chosenMove.targetSquare}");
+            return chosenMove;
+        }
+
+        public static List<Move> GetAllComputerPosibleMoves()
+        {
+            List<Move> possibleMoves = new List<Move>();
+            for (int i = 0; i < Board.Square.Length; i++)
+            {
+                if (Board.Square[i] > 16)
+                {
+                    for (int targetSquare = 0; targetSquare < Board.Square.Length; targetSquare++)
+                    {
+                        if (Move.IsMoveValid(Board.Square[i], i, targetSquare))
+                        {
+                            possibleMoves.Add(new Move(Board.Square[i], i, targetSquare));
+                            Console.WriteLine($"{Board.Square[i]}, {i}, {targetSquare}");
+                        }
+                    }
+                }
+            }
+            return possibleMoves;
         }
 
         public static void DrawBoard(int[] Square)
