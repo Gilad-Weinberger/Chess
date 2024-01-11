@@ -63,12 +63,12 @@ namespace Chess
                 else if (Direction == 16)
                     return targetPiece == Piece.None && (startSquare / 8) + 1 == 2;
                 else
-                    return (targetPiece % 8 < 16) || unPassont();
+                    return (targetPiece > 16) || unPassont();
             }
             return false;
         }
         public static bool unPassont(){
-            return false; 
+            return false;
         }
     }
 }
