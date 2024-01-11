@@ -10,56 +10,85 @@ namespace Chess
     {
         static void Main(string[] args)
         {
-            Board Square = new Board();
-            DrawBoard(Square);
-        }
 
-        public static void DrawBoard(Board Square)
-        {
-            for (int rank = 1; rank <= 8; rank++)
+            const string startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+            
+            Board Board = new Board();
+            Board.LoadPositionFromFen(startFen);
+            DrawBoard(Board.Square);
+
+            while ((!Board.checkmate) & (!Board.draw))
             {
-                Console.WriteLine(string.Concat(System.Linq.Enumerable.Repeat("-", 33))); 
-                for (int file = 1; file <= 8; file++)
-                {
-                    Console.Write("| " + "b" + " ");
-                }
-                Console.Write("|   ");
-                Console.WriteLine();
-            }
-            Console.WriteLine(string.Concat(System.Linq.Enumerable.Repeat("-", 33)));
+                int ColorToMove = Board.ColorToMove;
+                string Color = (ColorToMove == Piece.White) ? "White" : "Black";
+                if (Piece.IsColor(Piece.White, ColorToMove))
+                {                    
+                    while (true)
+                    {
+                        Console.WriteLine($"Enter {Color}'s Move:");
+                        string MoveText = Console.ReadLine();
+                        int startSquare = (int.Parse(MoveText[1].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[0]) - 97)));
+                        int targetSquare = (int.Parse(MoveText[3].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[2]) - 97)));
+                        int piece = Board.Square[startSquare];
 
-        }
+                        Move move = new Move(startSquare, targetSquare, piece);
 
-        public static void LoadPositionFromFen(string fen)
-        {
-            var pieceTypeFromSymbol = new Dictionary<char, int>()
-            {
-                ['k'] = Piece.King,
-                ['p'] = Piece.Pawn,
-                ['n'] = Piece.Knight,
-                ['b'] = Piece.Bishop,
-                ['r'] = Piece.Rook,
-                ['q'] = Piece.Queen
-            };
+                        if (move != null)
+                        {
+                            Board.Move(move);
+                            break;
+                        }
 
-            string fenBoard = fen.Split(' ')[0];
-            int file = 0, rank = 7;
+                        Console.WriteLine($"{MoveText} is and invalid move");
+                    }
 
-            foreach (char symbol in fenBoard)
-            {
-                if (symbol == '/')
-                {
-                    file = 0;
-                    rank--;
+                    DrawBoard(Board.Square);
                 }
                 else
                 {
-                    if (char.IsDigit(symbol))
-                    {
-                        file += (int)char.GetNumericValue(symbol);
-                    }
+
                 }
             }
+
+            if (Board.checkmate)
+            {
+                string winnerColor = (Board.winner == Piece.White) ? "White" : "Black";
+                Console.WriteLine("CheckMate! {} wins!");
+            }
+            else if (Board.draw)
+            {
+                Console.WriteLine("It's a draw!");
+            }
+        }
+
+        public static void DrawBoard(int[] Square)
+        {
+            Console.WriteLine();
+            printLetters();
+            for (int rank = 7; rank >= 0; rank--)
+            {
+                Console.WriteLine($"        {string.Concat(Enumerable.Repeat("-", 33))}");
+                Console.Write($"      {rank + 1}");
+                for (int file = 0; file < 8; file++)
+                {
+                    Console.Write($" | {Piece.GetPieceSymbol(Square[rank * 8 + file])}");
+                }
+                Console.Write($" | {rank + 1}");
+                Console.WriteLine();
+            }
+            Console.WriteLine($"        {string.Concat(Enumerable.Repeat("-", 33))}");
+            printLetters();
+            Console.WriteLine();
+        }
+
+        public static void printLetters()
+        {
+            Console.Write("        ");
+            for (int i = 1; i <= 8; i++)
+            {
+                Console.Write($"  {(char)(i + 96)} ");
+            }
+            Console.WriteLine();
         }
     }
 }
