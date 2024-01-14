@@ -9,7 +9,7 @@ namespace Chess
     class ValidateMove
     {
         public static bool SlidingPieces(int[] validDirections, int startSquare, int targetSquare)
-        {
+        { 
             for (int i = 0; i < validDirections.Length; i++)
             {
                 int line = startSquare / 8;
@@ -45,6 +45,14 @@ namespace Chess
         public static bool Pawn(int[] validDirections, int startSquare, int targetSquare)
         {
             int targetPiece = Board.Square[targetSquare];
+            int thisPiece = Board.Square[startSquare];
+
+            if (thisPiece > 16)
+                validDirections = validDirections.Skip(4).Take(5).ToArray();
+            else
+                validDirections = validDirections.Take(4).ToArray();
+
+
             int Direction = 0;
             bool validWriting = false;
             for (int i = 0; i < validDirections.Length; i++)
@@ -58,17 +66,57 @@ namespace Chess
             }
             if (validWriting)
             {
-                if (Direction == 8)
-                    return targetPiece == Piece.None;
-                else if (Direction == 16)
-                    return targetPiece == Piece.None && (startSquare / 8) + 1 == 2;
+                if (Math.Abs(Direction) == 8)
+                {
+                    if (targetPiece == Piece.None)
+                    {
+                        CheckForBecomingQueen(thisPiece, targetSquare);
+                        return true;
+                    }
+                }
+                else if (Math.Abs(Direction) == 16)
+                {
+                    if (thisPiece > 16)
+                        return targetPiece == Piece.None && (startSquare / 8) + 1 == 7;
+                    else
+                        return targetPiece == Piece.None && (startSquare / 8) + 1 == 2;
+                }
                 else
-                    return (targetPiece % 8 < 16) || unPassont();
+                {
+                    if ((targetPiece > 16) || EnPassant(startSquare, targetSquare))
+                    {
+                        CheckForBecomingQueen(startSquare, targetSquare);
+                        return true;
+                    }
+                }
             }
             return false;
         }
-        public static bool unPassont(){
-            return false; 
+        public static bool EnPassant(int startSquare, int targetSquare)
+        {
+            Move lastMove = Board.GameMoves[Board.GameMoves.Count - 1];
+            if (lastMove.piece == (Piece.Pawn | Piece.Black)) {
+                if ((startSquare / 8) + 1 == 5) {
+                    int distance = lastMove.startSquare - startSquare;
+                    if ((distance == 15 || distance == 17) && (lastMove.targetSquare / 8) + 1 == 5)
+                    {
+                        Board.Square[lastMove.targetSquare] = 0;
+                        return true;
+                    }
+                } 
+            }
+            return false;
+        }
+
+        public static void CheckForBecomingQueen(int startSquare, int targetSquare)
+        {
+            if ((targetSquare / 8) + 1 == 8)
+            {
+                if (Board.Square[startSquare] > 16)
+                    Board.Square[startSquare] = Piece.Queen | Piece.Black;
+                else
+                    Board.Square[startSquare] = Piece.Queen | Piece.White;
+            }
         }
     }
 }

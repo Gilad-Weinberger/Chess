@@ -9,8 +9,12 @@ namespace Chess
     class Board
     {
         public static int[] Square = new int[64];
+        public static List<Move> GameMoves = new List<Move>();
+
         public static int ColorToMove = 8, friendlyColor = 8, opponentColor = 16;
         public static int PawnsRank = 2;
+        public bool checkmate = false, draw = false;
+        public int winner = 1;
 
         public static void Move(Move move)
         {

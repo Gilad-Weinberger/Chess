@@ -10,8 +10,6 @@ namespace Chess
     {
         static void Main(string[] args)
         {
-            bool checkmate = false, draw = false;
-            int winner = 1;
 
             const string startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
             
@@ -19,18 +17,17 @@ namespace Chess
             Board.LoadPositionFromFen(startFen);
             DrawBoard(Board.Square);
 
-            while ((!checkmate) & (!draw))
+            while ((!Board.checkmate) & (!Board.draw))
             {
-                int ColorToMove = Board.ColorToMove;
-                string Color = (ColorToMove == Piece.White) ? "White" : "Black";
-                if (Piece.IsColor(Piece.White, ColorToMove))
-                {                    
+                string Color = (Board.ColorToMove == Piece.White) ? "White" : "Black";
+                if (Piece.IsColor(Piece.White, Board.ColorToMove))
+                {
                     while (true)
                     {
                         Console.WriteLine($"Enter {Color}'s Move:");
                         string MoveText = Console.ReadLine();
-                        int startSquare = (int.Parse(MoveText[1].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[0]) - 97)));
-                        int targetSquare = (int.Parse(MoveText[3].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[2]) - 97)));
+                        int startSquare = int.Parse(MoveText[1].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[0]) - 97));
+                        int targetSquare = int.Parse(MoveText[3].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[2]) - 97));
                         int piece = Board.Square[startSquare];
 
                         Move move = new Move(startSquare, targetSquare, piece);
@@ -38,12 +35,13 @@ namespace Chess
                         if (move != null)
                         {
                             Board.Move(move);
+                            Board.GameMoves.Add(move);
                             break;
                         }
 
                         Console.WriteLine($"{MoveText} is and invalid move");
                     }
-
+                    /*Console.Clear();*/
                     DrawBoard(Board.Square);
                 }
                 else
@@ -52,12 +50,12 @@ namespace Chess
                 }
             }
 
-            if (checkmate)
+            if (Board.checkmate)
             {
-                string winnerColor = (winner == Piece.White) ? "White" : "Black";
+                string winnerColor = (Board.winner == Piece.White) ? "White" : "Black";
                 Console.WriteLine("CheckMate! {} wins!");
             }
-            else if (draw)
+            else if (Board.draw)
             {
                 Console.WriteLine("It's a draw!");
             }
@@ -66,24 +64,40 @@ namespace Chess
         public static void DrawBoard(int[] Square)
         {
             Console.WriteLine();
-            printLetters();
+            printFilesLetters();
             for (int rank = 7; rank >= 0; rank--)
             {
                 Console.WriteLine($"        {string.Concat(Enumerable.Repeat("-", 33))}");
-                Console.Write($"      {rank + 1}");
+                Console.Write($"      {rank + 1} ");
                 for (int file = 0; file < 8; file++)
                 {
-                    Console.Write($" | {Piece.GetPieceSymbol(Square[rank * 8 + file])}");
+                    Console.Write($"|");
+                    int piece = Square[rank * 8 + file];
+                    if ((file + 7 - rank) % 2 == 0)
+                        Console.BackgroundColor = ConsoleColor.Magenta;
+                    else
+                        Console.BackgroundColor = ConsoleColor.DarkMagenta;
+                    if (piece < 16)
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Black;
+                    }
+                    Console.Write($" {Piece.GetPieceSymbol(piece)} ");
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
-                Console.Write($" | {rank + 1}");
+                Console.Write($"| {rank + 1}");
                 Console.WriteLine();
             }
             Console.WriteLine($"        {string.Concat(Enumerable.Repeat("-", 33))}");
-            printLetters();
+            printFilesLetters();
             Console.WriteLine();
         }
 
-        public static void printLetters()
+        public static void printFilesLetters()
         {
             Console.Write("        ");
             for (int i = 1; i <= 8; i++)
