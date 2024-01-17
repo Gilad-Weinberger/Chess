@@ -35,6 +35,7 @@ namespace Chess
             int pieceType = piece % 8;
 
             if (piece / 8 == targetSquare / 8) { return false; }
+            if (Piece.IsColor(Board.Square[targetSquare], Board.ColorToMove)) { return false;  }
 
             switch (pieceType)
             {

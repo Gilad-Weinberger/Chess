@@ -12,15 +12,23 @@ namespace Chess
         public static List<Move> GameMoves = new List<Move>();
 
         public static int ColorToMove = 8, friendlyColor = 8, opponentColor = 16;
+        public static int WhiteKingPosition = 0, BlackKingPosition = 0;
         public static int PawnsRank = 2;
         public bool checkmate = false, draw = false;
         public int winner = 1;
 
-        public static void Move(Move move)
+        public static void MakeMove(Move move)
         {
             int PieceToMove = Board.Square[move.startSquare];
             Board.Square[move.startSquare] = 0;
             Board.Square[move.targetSquare] = PieceToMove;
+        }
+
+        public static void UnmakeMove(Move move)
+        {
+            int PieceToUnmove = Board.Square[move.targetSquare];
+            Board.Square[move.targetSquare] = 0;
+            Board.Square[move.startSquare] = PieceToUnmove;
         }
 
         public static void LoadPositionFromFen(string fen)
