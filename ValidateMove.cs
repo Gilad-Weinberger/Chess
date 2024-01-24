@@ -8,7 +8,7 @@ namespace Chess
 {
     class ValidateMove
     {
-        public static bool SlidingPieces(int[] validDirections, int startSquare, int targetSquare)
+        public static bool SlidingPieces(int[] validDirections, int startSquare, int targetSquare, bool CheckChecks)
         {
             for (int i = 0; i < validDirections.Length; i++)
             {
@@ -22,19 +22,31 @@ namespace Chess
                     }
                     if (position == targetSquare)
                     {
-                        Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare]);
-                        return CheckForChecks(moveToVerify);
+                        if (CheckChecks)
+                        {
+                            Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
+                            return CheckForChecks(moveToVerify);
+                        }
+                        else
+                        {
+                            return true;
+                        }
                     }
-                    else if (position != startSquare && Board.Square[position] > 0)
+                    else if (position != startSquare && position != targetSquare && Board.Square[position] > 0)
                     {
-                        break; 
+                        break;
                     }
+                    /*Console.WriteLine($"{Board.Square[startSquare]}: {position}");*/
                     position += validDirections[i];
+                    if (position + 1 % 8 == 0)
+                    {
+                        break;
+                    }
                 }
             }
             return false;
         }
-        public static bool KingOrKnight(int[] validDirections, int startSquare, int targetSquare)
+        public static bool KingOrKnight(int[] validDirections, int startSquare, int targetSquare, bool CheckChecks)
         {
             for (int i = 0; i < validDirections.Length; i++)
             {
@@ -42,14 +54,21 @@ namespace Chess
                 {
                     if (startSquare + validDirections[i] == targetSquare)
                     {
-                        Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare]);
-                        return CheckForChecks(moveToVerify);
+                        if (CheckChecks)
+                        {
+                            Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
+                            return CheckForChecks(moveToVerify);
+                        }
+                        else
+                        {
+                            return true;
+                        }
                     }
                 }
             }
             return false;
         }
-        public static bool Pawn(int[] validDirections, int startSquare, int targetSquare)
+        public static bool Pawn(int[] validDirections, int startSquare, int targetSquare, bool CheckChecks)
         {
             int targetPiece = Board.Square[targetSquare];
             int thisPiece = Board.Square[startSquare];
@@ -78,30 +97,62 @@ namespace Chess
                     if (targetPiece == Piece.None)
                     {
                         CheckForBecomingQueen(thisPiece, targetSquare);
-                        Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare]);
-                        return CheckForChecks(moveToVerify);
+                        if (CheckChecks) { 
+                            Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
+                            return CheckForChecks(moveToVerify);
+                        }
+                        else { 
+                            return true;
+                        }
                     }
                 }
                 else if (Math.Abs(Direction) == 16)
                 {
                     if (thisPiece > 16)
                     {
-                        Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare]);
-                        return targetPiece == Piece.None && (startSquare / 8) + 1 == 7 && CheckForChecks(moveToVerify);
+                        if (targetPiece == Piece.None && (startSquare / 8) + 1 == 7)
+                        {
+                            if (CheckChecks)
+                            {
+                                Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
+                                return CheckForChecks(moveToVerify);
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                        }
                     }
                     else
                     {
-                        Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare]);
-                        return targetPiece == Piece.None && (startSquare / 8) + 1 == 2 && CheckForChecks(moveToVerify);
+                        if (targetPiece == Piece.None && (startSquare / 8) + 1 == 2)
+                        {
+                            if (CheckChecks)
+                            {
+                                Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
+                                return CheckForChecks(moveToVerify);
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                        }
                     }
                 }
                 else
                 {
                     if ((targetPiece > 16) || EnPassant(startSquare, targetSquare))
                     {
-                        Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare]);
                         CheckForBecomingQueen(startSquare, targetSquare);
-                        return CheckForChecks(moveToVerify);
+                        if (CheckChecks)
+                        {
+                            Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
+                            return CheckForChecks(moveToVerify);
+                        }
+                        else
+                        {
+                            return true;
+                        }
                     }
                 }
             }
@@ -109,6 +160,8 @@ namespace Chess
         }
         public static bool EnPassant(int startSquare, int targetSquare)
         {
+            if (Board.GameMoves.Count < 1)
+                return false;
             Move lastMove = Board.GameMoves[Board.GameMoves.Count - 1];
             if (lastMove.piece == (Piece.Pawn | Piece.Black)) {
                 if ((startSquare / 8) + 1 == 5) {
@@ -137,29 +190,13 @@ namespace Chess
         public static bool CheckForChecks(Move moveToVerify)
         {
             Board.MakeMove(moveToVerify);
-            List<Move> possibleResponseMoves = Bot.GetAllPosibleMovesForColor(Board.ColorToMove + 8);
-            for (int i = 0; i < possibleResponseMoves.Count; i++)
-            {
-                Console.WriteLine(possibleResponseMoves[i].startSquare);
-                Console.WriteLine(possibleResponseMoves[i].targetSquare);
-                if (((Board.ColorToMove + 8) % 16) != 8) {
-                    if (possibleResponseMoves[i].targetSquare == Board.BlackKingPosition)
-                    {
-                        Board.UnmakeMove(moveToVerify);
-                        return false;
-                    }
-                }
-                else
-                {
-                    if (possibleResponseMoves[i].targetSquare == Board.WhiteKingPosition)
-                    {
-                        Board.UnmakeMove(moveToVerify);
-                        return false;
-                    }
-                }
-            }
+            int opponentKingPosition = (Board.ColorToMove % 16 != Piece.White) ? Board.BlackKingPosition : Board.WhiteKingPosition;
+
+            bool isChecked = Bot.GetAllPosibleMovesForColor(Board.ColorToMove + 8, false)
+                .Any(move => move.targetSquare == opponentKingPosition);
+
             Board.UnmakeMove(moveToVerify);
-            return true;
+            return !isChecked;
         }
     }
 }

@@ -30,9 +30,9 @@ namespace Chess
                         int targetSquare = int.Parse(MoveText[3].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[2]) - 97));
                         int piece = Board.Square[startSquare];
 
-                        Move move = new Move(startSquare, targetSquare, piece);
+                        Move move = new Move(startSquare, targetSquare, piece, true);
 
-                        if (move != null)
+                        if (Move.IsMoveValid(move.piece, move.startSquare, move.targetSquare, true))
                         {
                             Board.MakeMove(move);
                             Board.GameMoves.Add(move);
@@ -45,7 +45,10 @@ namespace Chess
                 }
                 else
                 {
-                    Move blackMove = new Move(Bot.ChooseComputerMove(Board));
+                    int botPossibleMovesCount = Bot.GetAllPosibleMovesForColor(16, true).Count;
+                    Console.WriteLine(botPossibleMovesCount);
+                    Console.WriteLine();
+                    Move blackMove = new Move(Bot.ChooseComputerMove(), false);
                     Board.MakeMove(blackMove);
                     Board.GameMoves.Add(blackMove);
                     DrawBoard(Board.Square);
