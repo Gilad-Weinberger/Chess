@@ -37,13 +37,22 @@ namespace Chess
             }
         }
 
-        public static bool IsColor(int piece, int color)
+        public static bool IsColor(int pieceValue, int color)
         {
-            int pieceColor = piece & (Piece.White | Piece.Black);
+            int pieceColor = pieceValue & (Piece.White | Piece.Black);
+            int colorUpdated = color & (Piece.White | Piece.Black);
 
-            if (color == White)
-                return pieceColor == White;
-            return pieceColor == Black;
+            return pieceColor == colorUpdated;
+        }
+
+        public static int GetColor(int pieceValue)
+        {
+            return pieceValue & (Piece.White | Piece.Black);
+        }
+
+        public static int GetPieceType(int pieceValue)
+        {
+            return pieceValue % 8;
         }
     }
 }

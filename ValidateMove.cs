@@ -12,35 +12,42 @@ namespace Chess
         {
             for (int i = 0; i < validDirections.Length; i++)
             {
-                int line = startSquare / 8;
-                int position = startSquare;
-                while (position >= 0 && position < 64)
+                if ((targetSquare - startSquare) % validDirections[i] == 0)
                 {
-                    if (Math.Abs(validDirections[i]) == 1 && line != position / 8)
+                    int line = startSquare / 8;
+                    int position = startSquare;
+                    while (position >= 0 && position < 64)
                     {
-                        break;
-                    }
-                    if (position == targetSquare)
-                    {
-                        if (CheckChecks)
+                        if (Math.Abs(validDirections[i]) == 1 && line != position / 8)
                         {
-                            Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
-                            return CheckForChecks(moveToVerify);
+                            break;
                         }
-                        else
+                        if (position == targetSquare)
                         {
-                            return true;
+                            if (CheckChecks)
+                            {
+                                Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
+                                return CheckForChecks(moveToVerify);
+                            }
+                            else
+                            {
+                                return true;
+                            }
                         }
-                    }
-                    else if (position != startSquare && position != targetSquare && Board.Square[position] > 0)
-                    {
-                        break;
-                    }
-                    /*Console.WriteLine($"{Board.Square[startSquare]}: {position}");*/
-                    position += validDirections[i];
-                    if (position + 1 % 8 == 0)
-                    {
-                        break;
+                        else if (position != startSquare && position != targetSquare && Board.Square[position] > 0)
+                        {
+                            break;
+                        }
+                        char currentFile = Board.IndexToChessPosition(position)[0];
+                        if (position != startSquare && (currentFile == 'a' || currentFile == 'h'))
+                        {
+                            return false;
+                        }
+                        position += validDirections[i];
+                        if (position + 1 % 8 == 0)
+                        {
+                            break;
+                        }
                     }
                 }
             }
@@ -54,6 +61,13 @@ namespace Chess
                 {
                     if (startSquare + validDirections[i] == targetSquare)
                     {
+                        if (Math.Abs(validDirections[i]) < 15)
+                        {
+                            int startRank = Board.IndexToChessPosition(startSquare)[1];
+                            int targetRank = Board.IndexToChessPosition(targetSquare)[1];
+                            if (Math.Abs(targetRank - startRank) != 1)
+                                return false;
+                        }
                         if (CheckChecks)
                         {
                             Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
@@ -94,6 +108,7 @@ namespace Chess
             {
                 if (Math.Abs(Direction) == 8)
                 {
+                    Move.Error = "There is a piece in your target square";
                     if (targetPiece == Piece.None)
                     {
                         CheckForBecomingQueen(thisPiece, targetSquare);
@@ -110,6 +125,7 @@ namespace Chess
                 {
                     if (thisPiece > 16)
                     {
+                        Move.Error = "There is a piece in your target square";
                         if (targetPiece == Piece.None && (startSquare / 8) + 1 == 7)
                         {
                             if (CheckChecks)
@@ -125,6 +141,7 @@ namespace Chess
                     }
                     else
                     {
+                        Move.Error = "There is a piece in your target square";
                         if (targetPiece == Piece.None && (startSquare / 8) + 1 == 2)
                         {
                             if (CheckChecks)
@@ -144,6 +161,7 @@ namespace Chess
                     if ((targetPiece > 16) || EnPassant(startSquare, targetSquare))
                     {
                         CheckForBecomingQueen(startSquare, targetSquare);
+                        Move.Error = "You can't eat an empty square";
                         if (CheckChecks)
                         {
                             Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
@@ -192,10 +210,11 @@ namespace Chess
             Board.MakeMove(moveToVerify);
             int opponentKingPosition = (Board.ColorToMove % 16 != Piece.White) ? Board.BlackKingPosition : Board.WhiteKingPosition;
 
-            bool isChecked = Bot.GetAllPosibleMovesForColor(Board.ColorToMove + 8, false)
+            bool isChecked = Bot.GetAllPosibleMovesForColor(Board.ColorToMove + 8, false, false)
                 .Any(move => move.targetSquare == opponentKingPosition);
 
             Board.UnmakeMove(moveToVerify);
+            Move.Error = "This Move allow your oppnent to eat your king";
             return !isChecked;
         }
     }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace Chess
 {
@@ -10,7 +10,6 @@ namespace Chess
     {
         static void Main(string[] args)
         {
-
             const string startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
             
             Board Board = new Board();
@@ -34,32 +33,33 @@ namespace Chess
 
                         if (Move.IsMoveValid(move.piece, move.startSquare, move.targetSquare, true))
                         {
+                            Move.Print(move);
                             Board.MakeMove(move);
                             Board.GameMoves.Add(move);
                             break;
                         }
 
                         Console.WriteLine($"{MoveText} is and invalid move");
+                        Console.WriteLine(Move.Error);
                     }
-                    Board.ColorToMove += 8;
                 }
                 else
                 {
-                    int botPossibleMovesCount = Bot.GetAllPosibleMovesForColor(16, true).Count;
-                    Console.WriteLine(botPossibleMovesCount);
-                    Console.WriteLine();
                     Move blackMove = new Move(Bot.ChooseComputerMove(), false);
+                    Move.Print(blackMove);
+                    Console.WriteLine(); 
                     Board.MakeMove(blackMove);
                     Board.GameMoves.Add(blackMove);
                     DrawBoard(Board.Square);
-                    Board.ColorToMove += 8;
+                    Console.WriteLine(Board.ChessPositionToIndex("b8") - Board.ChessPositionToIndex("h6"));
                 }
+                Board.ColorToMove += 8;
             }
 
             if (Board.checkmate)
             {
                 string winnerColor = (Board.winner == Piece.White) ? "White" : "Black";
-                Console.WriteLine("CheckMate! {} wins!");
+                Console.WriteLine($"CheckMate! {Board.ColorToMove - 8} wins!");
             }
             else if (Board.draw)
             {
