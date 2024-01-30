@@ -8,27 +8,52 @@ namespace Chess
 {
     class ValidateMove
     {
-        public static bool SlidingPieces(int[] validDirections, int startSquare, int targetSquare)
-        { 
+        public static bool SlidingPieces(int[] validDirections, int startSquare, int targetSquare, bool CheckChecks)
+        {
             for (int i = 0; i < validDirections.Length; i++)
             {
-                int line = startSquare / 8;
-                int position = startSquare;
-                while (position >= 0 && position < 64)
+                if ((targetSquare - startSquare) % validDirections[i] == 0)
                 {
-                    if (Math.Abs(validDirections[i]) == 1 && line != position / 8)
-                        break;
-                    if (position == targetSquare)
+                    int line = startSquare / 8;
+                    int position = startSquare;
+                    while (position >= 0 && position < 64)
                     {
-                        return true;
+                        if (Math.Abs(validDirections[i]) == 1 && line != position / 8)
+                        {
+                            break;
+                        }
+                        if (position == targetSquare)
+                        {
+                            if (CheckChecks)
+                            {
+                                Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
+                                return CheckForChecks(moveToVerify);
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                        }
+                        else if (position != startSquare && position != targetSquare && Board.Square[position] > 0)
+                        {
+                            break;
+                        }
+                        char currentFile = Board.IndexToChessPosition(position)[0];
+                        if (position != startSquare && (currentFile == 'a' || currentFile == 'h'))
+                        {
+                            return false;
+                        }
+                        position += validDirections[i];
+                        if (position + 1 % 8 == 0)
+                        {
+                            break;
+                        }
                     }
-                    position += validDirections[i];
-                    Console.WriteLine(position + 1);
                 }
             }
             return false;
         }
-        public static bool KingOrKnight(int[] validDirections, int startSquare, int targetSquare)
+        public static bool KingOrKnight(int[] validDirections, int startSquare, int targetSquare, bool CheckChecks)
         {
             for (int i = 0; i < validDirections.Length; i++)
             {
@@ -36,13 +61,28 @@ namespace Chess
                 {
                     if (startSquare + validDirections[i] == targetSquare)
                     {
-                        return true;
+                        if (Math.Abs(validDirections[i]) < 15)
+                        {
+                            int startRank = Board.IndexToChessPosition(startSquare)[1];
+                            int targetRank = Board.IndexToChessPosition(targetSquare)[1];
+                            if (Math.Abs(targetRank - startRank) != 1)
+                                return false;
+                        }
+                        if (CheckChecks)
+                        {
+                            Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
+                            return CheckForChecks(moveToVerify);
+                        }
+                        else
+                        {
+                            return true;
+                        }
                     }
                 }
             }
             return false;
         }
-        public static bool Pawn(int[] validDirections, int startSquare, int targetSquare)
+        public static bool Pawn(int[] validDirections, int startSquare, int targetSquare, bool CheckChecks)
         {
             int targetPiece = Board.Square[targetSquare];
             int thisPiece = Board.Square[startSquare];
@@ -68,25 +108,69 @@ namespace Chess
             {
                 if (Math.Abs(Direction) == 8)
                 {
+                    Move.Error = "There is a piece in your target square";
                     if (targetPiece == Piece.None)
                     {
                         CheckForBecomingQueen(thisPiece, targetSquare);
-                        return true;
+                        if (CheckChecks) { 
+                            Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
+                            return CheckForChecks(moveToVerify);
+                        }
+                        else { 
+                            return true;
+                        }
                     }
                 }
                 else if (Math.Abs(Direction) == 16)
                 {
                     if (thisPiece > 16)
-                        return targetPiece == Piece.None && (startSquare / 8) + 1 == 7;
+                    {
+                        Move.Error = "There is a piece in your target square";
+                        if (targetPiece == Piece.None && (startSquare / 8) + 1 == 7)
+                        {
+                            if (CheckChecks)
+                            {
+                                Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
+                                return CheckForChecks(moveToVerify);
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                        }
+                    }
                     else
-                        return targetPiece == Piece.None && (startSquare / 8) + 1 == 2;
+                    {
+                        Move.Error = "There is a piece in your target square";
+                        if (targetPiece == Piece.None && (startSquare / 8) + 1 == 2)
+                        {
+                            if (CheckChecks)
+                            {
+                                Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
+                                return CheckForChecks(moveToVerify);
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                        }
+                    }
                 }
                 else
                 {
                     if ((targetPiece > 16) || EnPassant(startSquare, targetSquare))
                     {
                         CheckForBecomingQueen(startSquare, targetSquare);
-                        return true;
+                        Move.Error = "You can't eat an empty square";
+                        if (CheckChecks)
+                        {
+                            Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
+                            return CheckForChecks(moveToVerify);
+                        }
+                        else
+                        {
+                            return true;
+                        }
                     }
                 }
             }
@@ -94,6 +178,8 @@ namespace Chess
         }
         public static bool EnPassant(int startSquare, int targetSquare)
         {
+            if (Board.GameMoves.Count < 1)
+                return false;
             Move lastMove = Board.GameMoves[Board.GameMoves.Count - 1];
             if (lastMove.piece == (Piece.Pawn | Piece.Black)) {
                 if ((startSquare / 8) + 1 == 5) {
@@ -117,6 +203,19 @@ namespace Chess
                 else
                     Board.Square[startSquare] = Piece.Queen | Piece.White;
             }
+        }
+
+        public static bool CheckForChecks(Move moveToVerify)
+        {
+            Board.MakeMove(moveToVerify);
+            int opponentKingPosition = (Board.ColorToMove % 16 != Piece.White) ? Board.BlackKingPosition : Board.WhiteKingPosition;
+
+            bool isChecked = Bot.GetAllPosibleMovesForColor(Board.ColorToMove + 8, false, false)
+                .Any(move => move.targetSquare == opponentKingPosition);
+
+            Board.UnmakeMove(moveToVerify);
+            Move.Error = "This Move allow your oppnent to eat your king";
+            return !isChecked;
         }
     }
 }

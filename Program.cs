@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace Chess
 {
@@ -10,7 +10,6 @@ namespace Chess
     {
         static void Main(string[] args)
         {
-
             const string startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
             
             Board Board = new Board();
@@ -20,40 +19,47 @@ namespace Chess
             while ((!Board.checkmate) & (!Board.draw))
             {
                 string Color = (Board.ColorToMove == Piece.White) ? "White" : "Black";
-                if (Piece.IsColor(Piece.White, Board.ColorToMove))
+                if (Board.ColorToMove % 16 != 0)
                 {
                     while (true)
                     {
-                        Console.WriteLine($"Enter {Color}'s Move:");
+                        Console.WriteLine($"Enter White's Move:");
                         string MoveText = Console.ReadLine();
                         int startSquare = int.Parse(MoveText[1].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[0]) - 97));
                         int targetSquare = int.Parse(MoveText[3].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[2]) - 97));
                         int piece = Board.Square[startSquare];
 
-                        Move move = new Move(startSquare, targetSquare, piece);
+                        Move move = new Move(startSquare, targetSquare, piece, true);
 
-                        if (move != null)
+                        if (Move.IsMoveValid(move.piece, move.startSquare, move.targetSquare, true))
                         {
-                            Board.Move(move);
+                            Move.Print(move);
+                            Board.MakeMove(move);
                             Board.GameMoves.Add(move);
                             break;
                         }
 
                         Console.WriteLine($"{MoveText} is and invalid move");
+                        Console.WriteLine(Move.Error);
                     }
-                    /*Console.Clear();*/
-                    DrawBoard(Board.Square);
                 }
                 else
                 {
-
+                    Move blackMove = new Move(Bot.ChooseComputerMove(), false);
+                    Move.Print(blackMove);
+                    Console.WriteLine(); 
+                    Board.MakeMove(blackMove);
+                    Board.GameMoves.Add(blackMove);
+                    DrawBoard(Board.Square);
+                    Console.WriteLine(Board.ChessPositionToIndex("b8") - Board.ChessPositionToIndex("h6"));
                 }
+                Board.ColorToMove += 8;
             }
 
             if (Board.checkmate)
             {
                 string winnerColor = (Board.winner == Piece.White) ? "White" : "Black";
-                Console.WriteLine("CheckMate! {} wins!");
+                Console.WriteLine($"CheckMate! {Board.ColorToMove - 8} wins!");
             }
             else if (Board.draw)
             {

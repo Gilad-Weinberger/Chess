@@ -12,16 +12,45 @@ namespace Chess
         public static List<Move> GameMoves = new List<Move>();
 
         public static int ColorToMove = 8, friendlyColor = 8, opponentColor = 16;
+        public static int WhiteKingPosition = 0, BlackKingPosition = 0;
         public static int PawnsRank = 2;
-        public bool checkmate = false, draw = false;
+        public static bool checkmate = false, draw = false;
         public int winner = 1;
 
-        public static void Move(Move move)
+        public static void MakeMove(Move move)
         {
             int PieceToMove = Board.Square[move.startSquare];
             Board.Square[move.startSquare] = 0;
             Board.Square[move.targetSquare] = PieceToMove;
         }
+
+        public static void UnmakeMove(Move move)
+        {
+            int PieceToUnmove = Board.Square[move.targetSquare];
+            Board.Square[move.targetSquare] = 0;
+            Board.Square[move.startSquare] = PieceToUnmove;
+        }
+
+        public static string IndexToChessPosition(int index)
+        {
+            if (index < 0 || index > 63)
+            {
+                return "Parameter is not valid";
+            }
+
+            char file = (char)('a' + index % 8);
+            int rank = (index / 8) + 1;
+
+            return $"{file}{rank}";
+        }
+        public static int ChessPositionToIndex(string position)
+        {
+            char file = position[0];
+            int rank = int.Parse(position[1].ToString());
+
+            return rank * 8 + (file - 'a');
+        }
+
 
         public static void LoadPositionFromFen(string fen)
         {
