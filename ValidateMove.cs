@@ -85,7 +85,6 @@ namespace Chess
             return false;
         }
 
-
         public static bool IsPieceOnTheEdge(int startSquare, int targetSquare)
         {
             if (Board.IndexToChessPosition(startSquare)[0] == 'a' && Board.IndexToChessPosition(targetSquare)[0] == 'h')
@@ -105,7 +104,6 @@ namespace Chess
             else
                 validDirections = validDirections.Take(4).ToArray();
 
-
             int Direction = 0;
             bool validWriting = false;
             for (int i = 0; i < validDirections.Length; i++)
@@ -119,12 +117,12 @@ namespace Chess
             }
             if (validWriting)
             {
+                Move.Error = "There is a piece in your target square";
                 if (Math.Abs(Direction) == 8)
                 {
-                    Move.Error = "There is a piece in your target square";
                     if (targetPiece == Piece.None)
                     {
-                        CheckForBecomingQueen(thisPiece, targetSquare);
+                        CheckForBecomingQueen(startSquare, targetSquare);
                         if (CheckChecks) { 
                             Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
                             return CheckForChecks(moveToVerify);
@@ -138,8 +136,7 @@ namespace Chess
                 {
                     if (thisPiece > 16)
                     {
-                        Move.Error = "There is a piece in your target square";
-                        if (targetPiece == Piece.None && (startSquare / 8) + 1 == 7)
+                        if (targetPiece == Piece.None && Board.GetRankOfPosition(startSquare) == 7)
                         {
                             if (CheckChecks)
                             {
@@ -154,8 +151,7 @@ namespace Chess
                     }
                     else
                     {
-                        Move.Error = "There is a piece in your target square";
-                        if (targetPiece == Piece.None && (startSquare / 8) + 1 == 2)
+                        if (targetPiece == Piece.None && Board.GetRankOfPosition(startSquare) == 2)
                         {
                             if (CheckChecks)
                             {
@@ -171,10 +167,11 @@ namespace Chess
                 }
                 else
                 {
-                    if ((targetPiece > 16) || EnPassant(startSquare, targetSquare))
+                    Move.Error = "You can't eat an empty square";
+                    if (Board.Square[targetSquare] > 16 || EnPassant(startSquare))
                     {
+                        Move.Error = "You can't eat an empty";
                         CheckForBecomingQueen(startSquare, targetSquare);
-                        Move.Error = "You can't eat an empty square";
                         if (CheckChecks)
                         {
                             Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
@@ -189,7 +186,8 @@ namespace Chess
             }
             return false;
         }
-        public static bool EnPassant(int startSquare, int targetSquare)
+
+        public static bool EnPassant(int startSquare)
         {
             if (Board.GameMoves.Count < 1)
                 return false;
@@ -209,12 +207,15 @@ namespace Chess
 
         public static void CheckForBecomingQueen(int startSquare, int targetSquare)
         {
-            if ((targetSquare / 8) + 1 == 8)
+            if (Board.GetRankOfPosition(targetSquare) == 8 && Board.Square[startSquare] > 16)
             {
-                if (Board.Square[startSquare] > 16)
-                    Board.Square[startSquare] = Piece.Queen | Piece.Black;
-                else
-                    Board.Square[startSquare] = Piece.Queen | Piece.White;
+                Console.WriteLine("black queen");
+                Board.Square[startSquare] = Piece.Queen | Piece.Black;
+            }
+            else if (Board.GetRankOfPosition(targetSquare) == 1 && Board.Square[startSquare] < 16)
+            {
+                Console.WriteLine("white queen");
+                Board.Square[startSquare] = Piece.Queen | Piece.White;
             }
         }
 
