@@ -58,7 +58,7 @@ namespace Chess
             if (Board.checkmate)
             {
                 string winnerColor = (Board.winner == Piece.White) ? "White" : "Black";
-                Console.WriteLine($"CheckMate! {Board.ColorToMove - 8} wins!");
+                Console.WriteLine($"CheckMate! {winnerColor} wins!");
             }
             else if (Board.draw)
             {
