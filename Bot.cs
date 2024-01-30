@@ -41,10 +41,11 @@ namespace Chess
                             {
                                 Console.Write(moveNumber + ": ");
                                 Move.Print(Board.Square[i], i, targetSquare);
-                                if (Board.Square[i] % 8 == 4 || Board.Square[i] % 8 == 3)
+                                /*int pieceType = Piece.GetPieceType(Board.Square[i]);
+                                if (pieceType == 4 || pieceType == 3)
                                 {
                                     Console.WriteLine(Math.Abs(targetSquare - i));
-                                }
+                                }*/
                             }
                             moveNumber++;
                             possibleMoves.Add(new Move(i, targetSquare, Board.Square[i], false));

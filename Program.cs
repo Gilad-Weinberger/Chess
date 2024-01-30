@@ -51,7 +51,6 @@ namespace Chess
                     Board.MakeMove(blackMove);
                     Board.GameMoves.Add(blackMove);
                     DrawBoard(Board.Square);
-                    Console.WriteLine(Board.ChessPositionToIndex("b8") - Board.ChessPositionToIndex("h6"));
                 }
                 Board.ColorToMove += 8;
             }

@@ -71,7 +71,9 @@ namespace Chess
                         if (CheckChecks)
                         {
                             Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
-                            return CheckForChecks(moveToVerify);
+                            if (IsPieceOnTheEdge(startSquare, targetSquare))
+                                return CheckForChecks(moveToVerify);
+                            return false;
                         }
                         else
                         {
@@ -82,6 +84,17 @@ namespace Chess
             }
             return false;
         }
+
+
+        public static bool IsPieceOnTheEdge(int startSquare, int targetSquare)
+        {
+            if (Board.IndexToChessPosition(startSquare)[0] == 'a' && Board.IndexToChessPosition(targetSquare)[0] == 'h')
+                return false;
+            if (Board.IndexToChessPosition(startSquare)[0] == 'h' && Board.IndexToChessPosition(targetSquare)[0] == 'a')
+                return false;
+            return true;
+        }
+
         public static bool Pawn(int[] validDirections, int startSquare, int targetSquare, bool CheckChecks)
         {
             int targetPiece = Board.Square[targetSquare];
