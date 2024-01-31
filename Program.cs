@@ -29,10 +29,12 @@ namespace Chess
                         int targetSquare = int.Parse(MoveText[3].ToString()) * 8 - (8 - (Convert.ToInt32(MoveText[2]) - 97));
                         int piece = Board.Square[startSquare];
 
-                        Move move = new Move(startSquare, targetSquare, piece, true);
+                        Move move = new Move(startSquare, targetSquare, piece, false);
 
                         if (Move.IsMoveValid(move.piece, move.startSquare, move.targetSquare, true))
                         {
+                            if (Piece.GetPieceType(move.piece) == Piece.King)
+                                Board.WhiteKingPosition = move.targetSquare;
                             Move.Print(move);
                             Board.MakeMove(move);
                             Board.GameMoves.Add(move);
@@ -46,12 +48,14 @@ namespace Chess
                 else
                 {
                     Move blackMove = new Move(Bot.ChooseComputerMove(), false);
+                    if (Piece.GetPieceType(blackMove.piece) == Piece.King)
+                        Board.BlackKingPosition = blackMove.targetSquare;
                     Move.Print(blackMove);
                     Console.WriteLine(); 
                     Board.MakeMove(blackMove);
                     Board.GameMoves.Add(blackMove);
                     DrawBoard(Board.Square);
-                    Console.WriteLine(Board.ChessPositionToIndex("b8") - Board.ChessPositionToIndex("h6"));
+                    Console.WriteLine(Board.WhiteKingPosition);
                 }
                 Board.ColorToMove += 8;
             }
@@ -59,7 +63,7 @@ namespace Chess
             if (Board.checkmate)
             {
                 string winnerColor = (Board.winner == Piece.White) ? "White" : "Black";
-                Console.WriteLine($"CheckMate! {Board.ColorToMove - 8} wins!");
+                Console.WriteLine($"CheckMate! {winnerColor} wins!");
             }
             else if (Board.draw)
             {

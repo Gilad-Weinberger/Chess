@@ -12,7 +12,7 @@ namespace Chess
         public static List<Move> GameMoves = new List<Move>();
 
         public static int ColorToMove = 8, friendlyColor = 8, opponentColor = 16;
-        public static int WhiteKingPosition = 0, BlackKingPosition = 0;
+        public static int WhiteKingPosition = ChessPositionToIndex("e1"), BlackKingPosition = ChessPositionToIndex("e8");
         public static int PawnsRank = 2;
         public static bool checkmate = false, draw = false;
         public int winner = 1;
@@ -33,24 +33,29 @@ namespace Chess
 
         public static string IndexToChessPosition(int index)
         {
-            if (index < 0 || index > 63)
-            {
-                return "Parameter is not valid";
-            }
-
             char file = (char)('a' + index % 8);
             int rank = (index / 8) + 1;
 
             return $"{file}{rank}";
         }
+
         public static int ChessPositionToIndex(string position)
         {
             char file = position[0];
             int rank = int.Parse(position[1].ToString());
 
-            return rank * 8 + (file - 'a');
+            return rank * 8 + (file - 'a') - 8;
         }
 
+        public static int GetFileNumberOfPosition(int position)
+        {
+            return position % 8;
+        }
+
+        public static int GetRankOfPosition(int position)
+        {
+            return (position / 8) + 1;
+        }
 
         public static void LoadPositionFromFen(string fen)
         {
