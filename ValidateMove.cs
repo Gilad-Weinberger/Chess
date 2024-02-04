@@ -221,13 +221,16 @@ namespace Chess
 
         public static bool CheckForChecks(Move moveToVerify)
         {
+            int piece = Board.Square[moveToVerify.targetSquare];
             Board.MakeMove(moveToVerify);
-            int opponentKingPosition = (Board.ColorToMove % 16 != Piece.White) ? Board.BlackKingPosition : Board.WhiteKingPosition;
+            int myKingPosition = (Board.ColorToMove % 16 != Board.friendlyColor) ? Board.BlackKingPosition : Board.WhiteKingPosition;
+
+            Console.WriteLine(Board.IndexToChessPosition(myKingPosition));
 
             bool isChecked = Bot.GetAllPosibleMovesForColor(Board.ColorToMove + 8, false, false)
-                .Any(move => move.targetSquare == opponentKingPosition);
+                .Any(move => move.targetSquare == myKingPosition);
 
-            Board.UnmakeMove(moveToVerify);
+            Board.UnmakeMove(moveToVerify, piece);
             Move.Error = "This Move allow your oppnent to eat your king";
             return !isChecked;
         }

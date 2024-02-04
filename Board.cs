@@ -24,10 +24,10 @@ namespace Chess
             Board.Square[move.targetSquare] = PieceToMove;
         }
 
-        public static void UnmakeMove(Move move)
+        public static void UnmakeMove(Move move, int pieceInTargetSquare)
         {
             int PieceToUnmove = Board.Square[move.targetSquare];
-            Board.Square[move.targetSquare] = 0;
+            Board.Square[move.targetSquare] = pieceInTargetSquare;
             Board.Square[move.startSquare] = PieceToUnmove;
         }
 
