@@ -12,7 +12,7 @@ namespace Chess
         {
             Random rnd = new Random();
             int color = 16;
-            List<Move> possibleMoves = GetAllPosibleMovesForColor(color, true, true);
+            List<Move> possibleMoves = GetAllPosibleMovesForColor(color, true, true, true);
             Console.WriteLine($"\nThere are {possibleMoves.Count} possible moves for Black\n");
             if (possibleMoves.Count == 0)
             {
@@ -23,7 +23,7 @@ namespace Chess
         }
 
 
-        public static List<Move> GetAllPosibleMovesForColor(int color, bool CheckChecks, bool PrintMoves)
+        public static List<Move> GetAllPosibleMovesForColor(int color, bool CheckForLosingKing, bool DeepCheck ,bool PrintMoves)
         {
             int moveNumber = 1;
             if (PrintMoves)
@@ -35,7 +35,7 @@ namespace Chess
                 {
                     for (int targetSquare = 0; targetSquare < Board.Square.Length; targetSquare++)
                     {
-                        if (Move.IsMoveValid(Board.Square[i], i, targetSquare, CheckChecks))
+                        if (Move.IsMoveValid(Board.Square[i], i, targetSquare, CheckForLosingKing))
                         {
                             if (PrintMoves)
                             {

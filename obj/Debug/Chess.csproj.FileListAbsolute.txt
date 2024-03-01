@@ -12,3 +12,10 @@ C:\Users\abgn1\OneDrive\Desktop\Gilad\Programming\Coding Portfolio\C#\Chess\obj\
 C:\Users\abgn1\OneDrive\Desktop\Gilad\Programming\Coding Portfolio\C#\Chess\obj\Debug\Chess.csproj.CoreCompileInputs.cache
 C:\Users\abgn1\OneDrive\Desktop\Gilad\Programming\Coding Portfolio\C#\Chess\obj\Debug\Chess.exe
 C:\Users\abgn1\OneDrive\Desktop\Gilad\Programming\Coding Portfolio\C#\Chess\obj\Debug\Chess.pdb
+F:\Coding Portfolio\C#\Chess\bin\Debug\Chess.exe.config
+F:\Coding Portfolio\C#\Chess\bin\Debug\Chess.exe
+F:\Coding Portfolio\C#\Chess\bin\Debug\Chess.pdb
+F:\Coding Portfolio\C#\Chess\obj\Debug\Chess.csproj.AssemblyReference.cache
+F:\Coding Portfolio\C#\Chess\obj\Debug\Chess.csproj.CoreCompileInputs.cache
+F:\Coding Portfolio\C#\Chess\obj\Debug\Chess.exe
+F:\Coding Portfolio\C#\Chess\obj\Debug\Chess.pdb

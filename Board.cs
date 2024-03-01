@@ -12,6 +12,7 @@ namespace Chess
         public static List<Move> GameMoves = new List<Move>();
 
         public static int ColorToMove = 8, friendlyColor = 8, opponentColor = 16;
+        public static bool whiteInChcek = false, blackInCheck = false;
         public static int WhiteKingPosition = ChessPositionToIndex("e1"), BlackKingPosition = ChessPositionToIndex("e8");
         public static int PawnsRank = 2;
         public static bool checkmate = false, draw = false;

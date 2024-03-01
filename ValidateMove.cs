@@ -27,7 +27,7 @@ namespace Chess
                             if (CheckChecks)
                             {
                                 Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
-                                return CheckForChecks(moveToVerify);
+                                return CheckForLosingKing(moveToVerify);
                             }
                             else
                             {
@@ -72,7 +72,7 @@ namespace Chess
                         {
                             Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
                             if (IsPieceOnTheEdge(startSquare, targetSquare))
-                                return CheckForChecks(moveToVerify);
+                                return CheckForLosingKing(moveToVerify);
                             return false;
                         }
                         else
@@ -125,7 +125,7 @@ namespace Chess
                         CheckForBecomingQueen(startSquare, targetSquare);
                         if (CheckChecks) { 
                             Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
-                            return CheckForChecks(moveToVerify);
+                            return CheckForLosingKing(moveToVerify);
                         }
                         else { 
                             return true;
@@ -141,11 +141,11 @@ namespace Chess
                             if (CheckChecks)
                             {
                                 Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
-                                return CheckForChecks(moveToVerify);
+                                return CheckForLosingKing(moveToVerify) && CheckForPieceInteruptingPawnMovement(startSquare, targetSquare);
                             }
                             else
                             {
-                                return true;
+                                return CheckForPieceInteruptingPawnMovement(startSquare, targetSquare);
                             }
                         }
                     }
@@ -156,11 +156,11 @@ namespace Chess
                             if (CheckChecks)
                             {
                                 Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
-                                return CheckForChecks(moveToVerify);
+                                return CheckForLosingKing(moveToVerify) && CheckForPieceInteruptingPawnMovement(startSquare, targetSquare);
                             }
                             else
                             {
-                                return true;
+                                return CheckForPieceInteruptingPawnMovement(startSquare, targetSquare);
                             }
                         }
                     }
@@ -175,16 +175,48 @@ namespace Chess
                         if (CheckChecks)
                         {
                             Move moveToVerify = new Move(startSquare, targetSquare, Board.Square[startSquare], false);
-                            return CheckForChecks(moveToVerify);
+                            return CheckForLosingKing(moveToVerify);
                         }
                         else
                         {
-                            return true;
+                             return true;
                         }
                     }
                 }
             }
             return false;
+        }
+
+        public static bool CheckForPieceInteruptingPawnMovement(int startSquare, int targetSquare)
+        {
+            if (targetSquare > startSquare)
+            {
+                for (int i = startSquare + 8; i < targetSquare; i+=8)
+                {
+                    if (Board.Square[i] > 0)
+                    {
+                        Move.Error = "There is a piece in the way!";
+                        return false;
+                    }
+                }
+                return true;
+            }
+            else if (targetSquare < startSquare)
+            {
+                for (int i = startSquare - 8; i > targetSquare; i-=8)
+                {
+                    if (Board.Square[i] > 0)
+                    {
+                        Move.Error = "There is a piece in the way!";
+                        return false;
+                    }
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public static bool EnPassant(int startSquare)
@@ -219,16 +251,54 @@ namespace Chess
             }
         }
 
-        public static bool CheckForChecks(Move moveToVerify)
+        public static bool CheckForLosingKing(Move moveToVerify)
         {
             int piece = Board.Square[moveToVerify.targetSquare];
             Board.MakeMove(moveToVerify);
             int myKingPosition = (Board.ColorToMove % 16 != Board.friendlyColor) ? Board.BlackKingPosition : Board.WhiteKingPosition;
 
-            Console.WriteLine(Board.IndexToChessPosition(myKingPosition));
+            bool isChecked = false;
+            if (Board.ColorToMove % 16 != Board.friendlyColor)
+            {
+                List<Move> moves1 = Bot.GetAllPosibleMovesForColor(Board.friendlyColor, false, false, false);
+                isChecked = moves1.Any(move => move.targetSquare == myKingPosition);
+                foreach (Move move1 in moves1)
+                {
+                    if (move1.targetSquare == myKingPosition)
+                    {
+                        isChecked = true;
 
-            bool isChecked = Bot.GetAllPosibleMovesForColor(Board.ColorToMove + 8, false, false)
-                .Any(move => move.targetSquare == myKingPosition);
+                        bool isCheckedBefore1 = isChecked;
+                        int piece1 = Board.Square[move1.targetSquare];
+                        Board.MakeMove(move1);
+                        List<Move> moves2 = Bot.GetAllPosibleMovesForColor(Board.opponentColor, false, false, false);
+
+                        foreach (Move move2 in moves2)
+                        {
+                            bool isCheckedBefore2 = isChecked;
+                            int piece2 = Board.Square[move2.targetSquare];
+                            Board.MakeMove(move2);
+                            List<Move> moves3 = Bot.GetAllPosibleMovesForColor(Board.friendlyColor, false, false, false);
+                            foreach (Move move3 in moves3)
+                            {
+                                if (move3.targetSquare == myKingPosition)
+                                    isChecked = true;
+                            }
+                            Board.UnmakeMove(move2, piece2);
+                            if (isChecked && !isCheckedBefore2)
+                                isChecked = false;
+                        }
+                        Board.UnmakeMove(move1, piece1);
+                        if (isChecked && !isCheckedBefore1)
+                            isChecked = false;
+                    }
+                }
+            }
+            else
+            {
+                List<Move> moves = Bot.GetAllPosibleMovesForColor(Board.opponentColor, false, false, false);
+                isChecked = moves.Any(move => move.targetSquare == myKingPosition);
+            }
 
             Board.UnmakeMove(moveToVerify, piece);
             Move.Error = "This Move allow your oppnent to eat your king";
